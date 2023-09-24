@@ -1,36 +1,6 @@
 <script lang="ts">
-import { getRandomData } from './data'
-
-function* chunkTwo<T>(array: T[]) {
-  for (let i = 0; i < array.length - 1; i++) {
-    yield [array[i], array[i + 1]]
-  }
-}
-
-// 窗口大小改变事件
-function resize() {
-  // 设置卡片类的高度等于宽度 字体大小等于宽度的1/4 不超过16px
-  let cards = document.getElementsByClassName('game-card');
-  for (let i = 0; i < cards.length; i++) {
-    cards[i].style.height = cards[i].offsetWidth + 'px';
-    cards[i].style.fontSize = Math.min(cards[i].offsetWidth / 5.3, 16) + 'px';
-  }
-}
-
-// 生成日期
-function getNowFormatDate() {
-  let date = new Date();
-  let year = date.getFullYear();
-  let month = date.getMonth() + 1;
-  let day = date.getDate();
-  if (month < 10) {
-    month = '0' + month;
-  }
-  if (day < 10) {
-    day = '0' + day;
-  }
-  return year + '-' + month + '-' + day;
-}
+import { getRandomData, setSeed } from './data'
+import { chunkTwo, getNowFormatDate } from './utils'
 
 interface Tile {
   text: string,
@@ -40,10 +10,10 @@ interface Tile {
   y: number,
 }
 
+type SelectedCells = {rowIndex: number, colIndex: number}[];
 
 // 初始化表格数据
 function initTableData() {
-  // 初始化表格数据
   const tableData: Tile[][] = [];
   for (let i = 0; i < 10; i++) {
     let row = [];
@@ -63,25 +33,21 @@ function initTableData() {
 }
 // 将剩余的格子向下移动
 async function moveDown(tableData: Tile[][]) {
-  // 遍历每一列
-  for (let colIndex = 0; colIndex < 10; colIndex++) {
-    // 倒序
-    for (let rowIndex = 10 - 1; rowIndex >= 0; rowIndex--) {
-      // 如果当前格子的表达式为空，则将当前格子上面的格子的表达式填充到当前格子
-      if (tableData[rowIndex][colIndex].text !== '') {
+  for (let rowIndex = 10 - 1; rowIndex >= 0; rowIndex--) {
+    for (let colIndex = 0; colIndex < 10; colIndex++) {
+      const currentCell = tableData[rowIndex][colIndex]
+      // if currentCell is not empty, skip
+      if (currentCell.text) {
         continue;
       }
-      // 延迟0.05秒
-      await new Promise(resolve => {
-        setTimeout(resolve, 50);
-      });
       // 找到当前格子上面的第一个非空格子
       let flag = false;
       for (let i = rowIndex - 1; i >= 0; i--) {
+        const cell = tableData[i][colIndex]
         // 如果找到了非空格子，则将其表达式填充到当前格子
-        if (tableData[i][colIndex].text != '') {
-          tableData[rowIndex][colIndex].text = tableData[i][colIndex].text;
-          tableData[rowIndex][colIndex].color = tableData[i][colIndex].color;
+        if (cell.text) {
+          currentCell.text = cell.text;
+          currentCell.color = cell.color;
           tableData[i][colIndex].text = '';
           tableData[i][colIndex].color = '';
           flag = true;
@@ -90,76 +56,44 @@ async function moveDown(tableData: Tile[][]) {
       }
       if (!flag) {
         let [text, color] = getRandomData();
-        tableData[rowIndex][colIndex].text = text;
-        tableData[rowIndex][colIndex].color = color;
+        currentCell.text = text;
+        currentCell.color = color;
       }
     }
+    // 延迟0.05秒
+    await new Promise(resolve => setTimeout(resolve, 50));
   }
 }
 
-// 生成新的表达式
-function generateNewText(state) {
-  const tableData = state.tableData
-  // 遍历每一列
-  for (let colIndex = 0; colIndex < 10; colIndex++) {
-    // 获取当前列的空格子数量
-    let emptyCount = 0;
-    for (let rowIndex = 0; rowIndex < 10; rowIndex++) {
-      // 如果当前格子的表达式为空，则空格子数量加1
-      if (tableData[rowIndex][colIndex].text == '') {
-        emptyCount++;
-      }
-    }
-    // 随机生成空格子数量个表达式
-    for (let i = 0; i < emptyCount; i++) {
-      // 随机生成表达式
-      let [text, color] = getRandomData();
-      // 随机生成空格子的位置
-      let rowIndex = Math.floor(Math.random() * (10 - emptyCount));
-      // 将表达式填充到空格子的位置
-      tableData[rowIndex][colIndex].text = text;
-      tableData[rowIndex][colIndex].color = color;
-    }
-  }
-}
-
-// 判断当前格子是否在上一个选中的格子的上下左右四个方向
-function canSelectTile(selectedTd: SelectedTd, row: number, col: number) {
-  if (selectedTd.length === 0) {
+function canSelectTile(selectedCells: SelectedCells, row: number, col: number) {
+  if (!selectedCells.length) {
     return true;
   }
-  let isSelected = selectedTd.some(td => {
-    return row === td.rowIndex && col === td.colIndex
+  let isSelected = selectedCells.some(cell => {
+    return row === cell.rowIndex && col === cell.colIndex
   });
   if (isSelected) {
     return false;
   }
-  let {rowIndex, colIndex} = selectedTd[selectedTd.length - 1];
+  let {rowIndex, colIndex} = selectedCells[selectedCells.length - 1];
   let isAdjacent =
     (row === rowIndex && Math.abs(col - colIndex) === 1) ||
     (col === colIndex && Math.abs(row - rowIndex) === 1)
   return isAdjacent
 }
 
-type SelectedTd = {rowIndex: number, colIndex: number}[];
 
 export default {
   data() {
     return {
       startSelect: false,
       tableData: [] as Tile[][],
-      // 用于记录当前点击的格子
-      selectedTd: [] as SelectedTd,
+      selectedCells: [] as SelectedCells,
       score: 0,
       maxScore: 0,
       log: '',
       seed: '',
     }
-  },
-  // 初始化
-  created() {
-    // 绑定窗口大小改变事件
-    window.addEventListener('resize', resize);
   },
   methods: {
     // 开始游戏
@@ -170,76 +104,67 @@ export default {
         // 当前时间戳
         seed = new Date().getTime().toString();
       }
-      Math.seedrandom(seed);
+      setSeed(seed);
 
-      // 初始化表格数据
       this.tableData = initTableData();
-      // 初始化分数
       this.score = 0;
-      // 初始化日志
       this.log = '一次性消除多个格子会有更高分数\n当前没有连锁消除功能\n当前种子：' + seed + '\n';
 
+      // 滚动到game组件
       this.$nextTick(() => {
-        // 窗口大小改变事件
-        resize();
-        // 滚动到game组件
         document.getElementById('game')!.scrollIntoView();
       });
     },
     pointerDown(rowIndex: number, colIndex: number) {
       this.startSelect = true
       this.tableData[rowIndex][colIndex].class = 'bg-primary';
-      this.selectedTd.push({ rowIndex, colIndex });
+      this.selectedCells.push({ rowIndex, colIndex });
     },
     // 点击格子
     pointerMove(rowIndex: number, colIndex: number) {
-      if (!this.startSelect || !canSelectTile(this.selectedTd, rowIndex, colIndex)) {
+      if (!this.startSelect || !canSelectTile(this.selectedCells, rowIndex, colIndex)) {
         return;
       }
       // 将当前格子的背景色置为蓝色
       this.tableData[rowIndex][colIndex].class = 'bg-primary';
       // 将上一个选中的格子的背景色置绿色
-      console.assert(this.selectedTd.length > 0)
-      let lastTd = this.selectedTd[this.selectedTd.length - 1];
+      console.assert(this.selectedCells.length > 0)
+      let lastTd = this.selectedCells[this.selectedCells.length - 1];
       this.tableData[lastTd.rowIndex][lastTd.colIndex].class = 'bg-success';
-      this.selectedTd.push({ rowIndex, colIndex });
+      this.selectedCells.push({ rowIndex, colIndex });
     },
     // 松开格子
     async pointerUp() {
       await this.tryRemove();
-      // 清空选中的格子
-      for (const {rowIndex, colIndex} of this.selectedTd) {
+      // clear selected cell style
+      for (const {rowIndex, colIndex} of this.selectedCells) {
         this.tableData[rowIndex][colIndex].class = '';
       }
-      this.selectedTd = [];
+      this.selectedCells = [];
       this.addLog('-'.repeat(12));
       this.startSelect = false
     },
     async tryRemove() {
-      // 如果选中的格子数量小于2，则不需要判断
-      if (this.selectedTd.length < 2) {
+      // no removal if only one selected cell
+      if (this.selectedCells.length < 2) {
         return;
       }
-      // 获取当前格子的表达式
       const selectedText = this.selectedText()
-      // 判断是否可以消除
       let canRemove = true;
       for (let [prevText, currentText] of chunkTwo(selectedText)) {
-        // 如果当前格子的表达式与第一个格子的表达式不相同，则不能消除
         if (eval(currentText) != eval(prevText)) {
           canRemove = false;
           this.addLog(currentText + ' != ' + prevText + '，不能消除！');
           break;
         }
       }
-      // 如果可以消除，则消除
       if (canRemove) {
-        this.doRemove()
+        await this.doRemove()
       }
     },
+    // return the array of selected cell text, normalized
     selectedText() {
-      return this.selectedTd.map(({rowIndex, colIndex}) => {
-        // 移除换行符
+      return this.selectedCells.map(({rowIndex, colIndex}) => {
         return this.tableData[rowIndex][colIndex].text.replace(/\n/g, '')
       });
     },
@@ -251,10 +176,8 @@ export default {
       this.addLog(text + '\n消除成功！');
       // 计算得分
       let turnScore = 1;
-      // 遍历选中的格子
-      for (let i = 0; i < this.selectedTd.length; i++) {
-        // 获取当前格子的行号和列号
-        let {rowIndex, colIndex} = this.selectedTd[i]
+      for (let i = 0; i < this.selectedCells.length; i++) {
+        let {rowIndex, colIndex} = this.selectedCells[i]
         const cell = this.tableData[rowIndex][colIndex]
         // reset text and style
         cell.text = '';
@@ -266,11 +189,8 @@ export default {
       this.score += turnScore;
       // 更新最高得分
       this.maxScore = Math.max(this.score, this.maxScore);
-      this.addLog('分数增加：' + turnScore);
       // 将剩余的格子向下移动
       await moveDown(this.tableData);
-      // 生成新的表达式
-      generateNewText(this);
     },
     addLog(text: string) {
       this.log += text + '\n';
@@ -287,8 +207,8 @@ export default {
 
 <template>
   <div class="row mt-3">
-    <div class="col-12 col-lg-8">
-      <div class="row" v-for="(row, rowIndex) in tableData" :key="rowIndex" id="game">
+    <div class="col-12 col-lg-8" id="game">
+      <div class="row" v-for="(row, rowIndex) in tableData" :key="rowIndex">
         <div class="col px-0" v-for="(col, colIndex) in row" :key="colIndex">
           <!-- 要兼容移动端 -->
           <div class="card game-card text-center" :class="col.class"
@@ -362,5 +282,16 @@ export default {
 .bg-success {
   transform: scale(1.05);
   z-index: 1;
+}
+
+.game-card {
+  aspect-ratio: 1;
+  width: 100%;
+}
+
+#game {
+  max-width: min(100vw, 100vh);
+  font-size: min(16px, min(2vw, 2vh));
+  user-select: none;
 }
 </style>
