@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>nice.js ——js真值表消消乐</title>
+      <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
+      <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+      <!-- vue3 -->
+      <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.2.6/vue.global.min.js"></script>
+      <!-- seedrandom -->
+      <script src="https://cdn.bootcdn.net/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
+      <style>
+          /* 每个格子等大，禁用拖拽选中和右键菜单 */
+          #game {
+              user-select: none;
+              -moz-user-select: none;
+              -webkit-user-select: none;
+              -ms-user-select: none;
+              -webkit-user-drag: none;
+              -webkit-touch-callout: none;
+          }
+
+          .game-card {
+              width: 100%;
+          }
+
+          body {
+              background: #bbe6ff;
+          }
+      </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
