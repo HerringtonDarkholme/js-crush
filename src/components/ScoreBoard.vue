@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, defineProps, watchEffect, watch } from 'vue'
+import { ref, computed, watchEffect, watch } from 'vue'
 import { addLog } from './logs'
 // TODO: add some JD for these positions
 const titles = [
@@ -12,9 +12,12 @@ const titles = [
   [500, 'JavaScript CTO'],
   [1000, 'Douglas Crockford'],
   [3000, 'Brendan Eich'],
-]
+] as const
 let props = defineProps({
-  score: Number
+  score: {
+    type: Number,
+    required: true,
+  },
 })
 let maxScore = ref(0)
 let title = computed(() => {

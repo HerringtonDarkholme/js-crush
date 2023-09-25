@@ -1,14 +1,17 @@
 <script lang="ts" setup>
 import { setSeed } from './data'
 import { getNowFormatDate } from './utils'
-import {ref, defineProps, defineEmits, watch, nextTick} from 'vue'
+import {ref, watch, nextTick} from 'vue'
 import ScoreBoard from './ScoreBoard.vue'
 import { logs } from './logs'
-let props = defineProps({
-  score: Number,
+defineProps({
+  score: {
+    type: Number,
+    required: true,
+  },
 })
 let emit = defineEmits<{
-  startGame: string
+  startGame: [s: string]
 }>()
 let seedRef = ref('')
 
