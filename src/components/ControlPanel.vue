@@ -3,9 +3,9 @@ import { setSeed } from './data'
 import { getNowFormatDate } from './utils'
 import {ref, defineProps, defineEmits, watch, nextTick} from 'vue'
 import ScoreBoard from './ScoreBoard.vue'
+import { logs } from './logs'
 let props = defineProps({
   score: Number,
-  logs: Array,
 })
 let emit = defineEmits<{
   startGame: string
@@ -23,7 +23,7 @@ function startGame() {
   emit('startGame', seed)
 }
 // scroll logs to bottom to show latest update
-watch(() => props.logs, () => {
+watch(logs, () => {
   nextTick(() => {
     let log = document.getElementById('log')!;
     log.scrollTop = log.scrollHeight;
@@ -79,5 +79,6 @@ pre {
   margin: 0;
   padding: 0.5em 0;
   border-bottom: 1px dashed currentColor;
+  white-space: pre-wrap;
 }
 </style>

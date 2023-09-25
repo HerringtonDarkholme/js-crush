@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { getRandomData } from './data'
+import { addLog, resetLog } from './logs'
 import { chunkTwo } from './utils'
 import {reactive, nextTick} from 'vue'
 import ControlPanel from './ControlPanel.vue'
@@ -86,9 +87,9 @@ function canSelectTile(selectedCells: SelectedCells, row: number, col: number) {
 
 // 开始游戏
 async function startGame(seed: string) {
-  state.tableData = initTableData();
-  state.score = 0;
-  state.logs = [`Game Seed: ${seed}`];
+  state.tableData = initTableData()
+  state.score = 0
+  resetLog(seed)
   nextTick(() => {
     document.getElementById('game')!.scrollIntoView();
   });
@@ -134,7 +135,11 @@ async function tryRemove() {
   for (let [prevText, currentText] of chunkTwo(text)) {
     if (eval(currentText) != eval(prevText)) {
       canRemove = false;
-      addLog(currentText + ' != ' + prevText + '\nNo Crush...');
+      addLog({
+        type: 'NoCrush',
+        currentText,
+        prevText,
+      })
       break;
     }
   }
@@ -149,15 +154,14 @@ function selectedText() {
   });
 }
 async function doRemove() {
-  // 记录日志
-  const text = [...chunkTwo(selectedText())]
-    .map(([prev, curr]) => `* ${prev} == ${curr}`)
-    .join('\n');
-  // 计算得分
   let len = state.selectedCells.length;
   let turnScore = 1 + (len - 1) * len / 2;
   state.score += turnScore;
-  addLog(text + '\nCrushed!! ' + `Score +${turnScore}`);
+  addLog({
+    type: 'Crushed',
+    selectedText: selectedText(),
+    turnScore,
+  });
   for (let {rowIndex, colIndex} of state.selectedCells) {
     const cell = state.tableData[rowIndex][colIndex]
     // reset text and style
@@ -167,16 +171,11 @@ async function doRemove() {
   await moveDown(state.tableData);
 }
 
-function addLog(text: string) {
-  state.logs.push(text);
-}
-
 const state = reactive({
   startSelect: false,
   tableData: [] as Tile[][],
   selectedCells: [] as SelectedCells,
   score: 0,
-  logs: [] as string[],
 })
 
 </script>
@@ -197,7 +196,7 @@ const state = reactive({
         </div>
       </div>
     </div>
-    <ControlPanel class="control-panel" :score="state.score" :logs="state.logs" @startGame="startGame"/>
+    <ControlPanel class="control-panel" :score="state.score" @startGame="startGame"/>
   </div>
 </template>
 

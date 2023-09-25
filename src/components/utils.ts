@@ -4,7 +4,6 @@ export function* chunkTwo<T>(array: T[]) {
   }
 }
 
-// 生成日期
 export function getNowFormatDate() {
   let date = new Date();
   let year = date.getFullYear();

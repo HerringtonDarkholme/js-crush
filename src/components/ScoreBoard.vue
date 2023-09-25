@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import {ref, computed, defineProps, watchEffect} from 'vue'
+import { ref, computed, defineProps, watchEffect, watch } from 'vue'
+import { addLog } from './logs'
 // TODO: add some JD for these positions
 const titles = [
   [0, 'JavaScript Learner'],
@@ -38,6 +39,12 @@ let title = computed(() => {
 watchEffect(() => {
   maxScore.value = Math.max(props.score, maxScore.value)
 })
+watch(() => title.value, (to, from) => {
+  addLog({
+    type: 'Promotion',
+    from, to
+  })
+})
 </script>
 
 <template>
@@ -48,7 +55,7 @@ watchEffect(() => {
       <p>Historical High: {{maxScore}}</p>
     </div>
     <h3 class="js-title-header">Title</h3>
-    <div class="js-title"><em>{{title}}</em></div>
+    <div class="js-title"><em :title="title">{{title}}</em></div>
   </div>
 </template>
 <style scoped>
