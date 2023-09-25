@@ -189,7 +189,7 @@ const state = reactive({
             @pointerdown="pointerDown(rowIndex, colIndex)"
             @pointerup="pointerUp"
             @pointermove="pointerMove(rowIndex, colIndex)"
-            :style="{background: col.color}"
+            :style="{'--tile-color': col.color}"
           >
             {{col.text}}
           </div>
@@ -205,27 +205,40 @@ const state = reactive({
   aspect-ratio: 1;
   word-break: break-word;
   border-radius: 6px;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.1s ease-in-out;
   border: 1px solid transparent;
   color: black;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
+  background-image:
+    radial-gradient(
+      100% 100% at 100% 0,
+      var(--tile-color) 0,
+      color-mix(in hsl, var(--tile-color) 75%, black) 100%
+    );
+  box-shadow:
+    rgba(45, 35, 66, .4) 0 2px 4px,
+    rgba(45, 35, 66, .3) 0 7px 13px -3px,
+    color-mix(in hsl, var(--tile-color) 50%, black) 0 -3px 0 inset;
 }
+
+
 .highlight {
-  transform: translateY(1px) scale(0.98);
+  box-shadow: color-mix(in hsl, var(--tile-color) 50%, black) 0 3px 7px inset;
+  transform: translateY(2px) scale(0.98);
   z-index: 2;
-  box-shadow: 0px 0px 5px rgba(255, 255, 0, 0.5) inset;
-  border-color: yellow;
+  /*border-color: yellow;*/
 }
 .selected {
-  transform: translateY(-1px);
-  box-shadow: 0px 2px 5px rgba(255, 255, 0, 0.8),
-    0px 2px 10px rgba(255, 255, 0, 0.5),
-    0px 2px 15px rgba(255, 255, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow:
+    rgba(45, 35, 66, .4) 0 4px 8px,
+    rgba(45, 35, 66, .3) 0 7px 13px -3px,
+    color-mix(in hsl, var(--tile-color) 50%, black) 0 -3px 0 inset;
   z-index: 1;
-  border-color: yellow;
+  /*border-color: yellow;*/
 }
 .row {
   gap: 2px;
