@@ -8,16 +8,17 @@ import Game from './components/Game.vue'
         <div class="alert alert-info" role="alert">
           <h1>JS Crush</h1>
           <p>
-            Inspired by
+            A parody game inspired by
             <a href="https://www.thomas-yang.me/projects/oh-my-dear-js/"
-            target="_blank">oh-my-dear-js</a></p>
+            target="_blank">oh-my-dear-js</a>.</p>
           <p>
             Instruction: Click <b>Start</b> to begin your challenge!
             Click and Swipe tiles and make sure two neighbor tiles are `==`.
             Release your swipe and eliminate all tiles if they are all weakly equal to their neighbors.
           </p>
-          <p> Note, only two adjacent tiles are compared. That means that even if `String("") != [0]`,  you can eliminate
-          all three tiles by following the path `String("") -> Number(0) -> [0]`.
+          <p> Note, only two adjacent tiles are compared.
+          That means that even if <code>String("") != [0]</code>,  you can eliminate
+          all three tiles by following the path <code>String("") -> Number(0) -> [0]</code>.
           </p>
           <p>
           Seed is for generating puzzles. You will always see the same board for the same seed.

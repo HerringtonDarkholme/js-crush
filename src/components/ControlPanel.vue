@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { setSeed } from './data'
 import { getNowFormatDate } from './utils'
-import {ref, defineProps, defineEmits} from 'vue'
+import {ref, defineProps, defineEmits, watch, nextTick} from 'vue'
 import ScoreBoard from './ScoreBoard.vue'
 let props = defineProps({
   score: Number,
-  log: String,
+  logs: Array,
 })
 let emit = defineEmits<{
   startGame: string
@@ -22,31 +22,41 @@ function startGame() {
   setSeed(seed);
   emit('startGame', seed)
 }
+// scroll logs to bottom to show latest update
+watch(() => props.logs, () => {
+  nextTick(() => {
+    let log = document.getElementById('log')!;
+    log.scrollTop = log.scrollHeight;
+  });
+}, {deep: true})
 
 </script>
 
 <template>
   <div class="controls">
-    <div class="row">
-      <span class="input-group-text">Random Seed</span>
+    <ScoreBoard class="card" :score="score"/>
+    <div class="card row">
+      <h3 class="input-group-text">Random Seed</h3>
       <input type="text" class="form-control" placeholder="Default to timestamp" v-model="seedRef">
       <button class="btn btn-primary" @click="startGame">Start</button>
       <button class="btn" type="button" id="button-addon2"
         @click="seedRef = getNowFormatDate()">Daily Challenge</button>
     </div>
-    <ScoreBoard :score="score"/>
-    <div class="text-dark">
-      <div class="card-header">
-        Log
-      </div>
+    <div class="card">
+      <h3 class="card-header">Journal</h3>
       <div class="card-body">
-        <textarea class="form-control" rows="10" readonly id="log">{{log}}</textarea>
+        <div class="logs" id="log">
+          <pre v-for="(log, idx) in logs" :key="idx">{{log}}</pre>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.card {
+  margin-bottom: 1em;
+}
 .row {
   gap: 1em;
 }
@@ -57,7 +67,17 @@ function startGame() {
   width: 100%;
 }
 .controls {
-  padding: 1em;
+  padding: 0 1em;
   min-width: 320px;
+}
+.logs {
+  text-align: left;
+  max-height: 9em;
+  overflow-y: auto;
+}
+pre {
+  margin: 0;
+  padding: 0.5em 0;
+  border-bottom: 1px dashed currentColor;
 }
 </style>

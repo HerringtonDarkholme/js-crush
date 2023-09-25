@@ -88,7 +88,7 @@ function canSelectTile(selectedCells: SelectedCells, row: number, col: number) {
 async function startGame(seed: string) {
   state.tableData = initTableData();
   state.score = 0;
-  state.log = 'Seed: ' + seed + '\n';
+  state.logs = [`Game Seed: ${seed}`];
   nextTick(() => {
     document.getElementById('game')!.scrollIntoView();
   });
@@ -121,7 +121,6 @@ async function pointerUp() {
     state.tableData[rowIndex][colIndex].class = '';
   }
   state.selectedCells = [];
-  addLog('-'.repeat(12));
   state.startSelect = false
 }
 
@@ -135,7 +134,7 @@ async function tryRemove() {
   for (let [prevText, currentText] of chunkTwo(text)) {
     if (eval(currentText) != eval(prevText)) {
       canRemove = false;
-      addLog(currentText + ' != ' + prevText + '，不能消除！');
+      addLog(currentText + ' != ' + prevText + '\nNo Crush...');
       break;
     }
   }
@@ -152,30 +151,24 @@ function selectedText() {
 async function doRemove() {
   // 记录日志
   const text = [...chunkTwo(selectedText())]
-    .map(([prev, curr]) => `${prev} == ${curr}`)
+    .map(([prev, curr]) => `* ${prev} == ${curr}`)
     .join('\n');
-  addLog(text + '\nCrushed!!');
   // 计算得分
   let len = state.selectedCells.length;
   let turnScore = 1 + (len - 1) * len / 2;
+  state.score += turnScore;
+  addLog(text + '\nCrushed!! ' + `Score +${turnScore}`);
   for (let {rowIndex, colIndex} of state.selectedCells) {
     const cell = state.tableData[rowIndex][colIndex]
     // reset text and style
     cell.text = '';
     cell.class = '';
   }
-  state.score += turnScore;
-  addLog(`Score +${turnScore}`);
   await moveDown(state.tableData);
 }
 
 function addLog(text: string) {
-  state.log += text + '\n';
-  // 滚动到底部
-  nextTick(() => {
-    let log = document.getElementById('log')!;
-    log.scrollTop = log.scrollHeight;
-  });
+  state.logs.push(text);
 }
 
 const state = reactive({
@@ -183,7 +176,7 @@ const state = reactive({
   tableData: [] as Tile[][],
   selectedCells: [] as SelectedCells,
   score: 0,
-  log: '',
+  logs: [] as string[],
 })
 
 </script>
@@ -204,7 +197,7 @@ const state = reactive({
         </div>
       </div>
     </div>
-    <ControlPanel class="control-panel" :score="state.score" :log="state.log" @startGame="startGame"/>
+    <ControlPanel class="control-panel" :score="state.score" :logs="state.logs" @startGame="startGame"/>
   </div>
 </template>
 

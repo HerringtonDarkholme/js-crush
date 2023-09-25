@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import {ref, computed, defineProps, watchEffect} from 'vue'
+// TODO: add some JD for these positions
 const titles = [
-  [0, 'JS Learner'],
-  [10, 'JS Intern'],
-  [25, 'Junior Eng'],
-  [50, 'Senior Eng'],
-  [100, 'Staff Eng'],
-  [200, 'Principal Eng'],
-  [500, 'JS CTO'],
+  [0, 'JavaScript Learner'],
+  [10, 'JavaScript Intern'],
+  [25, 'Junior Engineer'],
+  [50, 'Senior Engineer'],
+  [100, 'Staff Engineer'],
+  [200, 'Principal Engineer'],
+  [500, 'JavaScript CTO'],
   [1000, 'Douglas Crockford'],
   [3000, 'Brendan Eich'],
 ]
@@ -41,18 +42,25 @@ watchEffect(() => {
 
 <template>
   <div class="card">
-    <div class="card-header">
-      Score Board
-      <small class="text-muted">
-        * Restart will reset current score
-      </small>
-    </div>
-    <div class="card-body">
+    <h3 class="card-header"> Score Board </h3>
+    <div class="row">
       <p>Current Score: {{score}}</p>
       <p>Historical High: {{maxScore}}</p>
     </div>
-    <div class="card-header">
-      Title: <em>{{title}}</em>
-    </div>
+    <h3 class="js-title-header">Title</h3>
+    <div class="js-title"><em>{{title}}</em></div>
   </div>
 </template>
+<style scoped>
+.row > p {
+  flex: 1 0 40%;
+  margin: 0;
+  text-align: center;
+}
+.js-title-header {
+  margin-top: 1em;
+}
+.js-title {
+  text-align: center;
+}
+</style>
