@@ -182,12 +182,11 @@ const state = reactive({
 
 <template>
   <div class="row">
-    <div id="game">
+    <div id="game" @pointerup="pointerUp">
       <div class="row" v-for="(row, rowIndex) in state.tableData" :key="rowIndex">
         <div class="col px-0" v-for="(col, colIndex) in row" :key="colIndex">
           <div class="card game-card" :class="col.class"
             @pointerdown="pointerDown(rowIndex, colIndex)"
-            @pointerup="pointerUp"
             @pointermove="pointerMove(rowIndex, colIndex)"
             :style="{'--tile-color': col.color}"
           >
@@ -216,17 +215,17 @@ const state = reactive({
     radial-gradient(
       100% 100% at 100% 0,
       var(--tile-color) 0,
-      color-mix(in hsl, var(--tile-color) 75%, black) 100%
+      color-mix(in hsl, var(--tile-color) 80%, black) 100%
     );
   box-shadow:
     rgba(45, 35, 66, .4) 0 2px 4px,
     rgba(45, 35, 66, .3) 0 7px 13px -3px,
-    color-mix(in hsl, var(--tile-color) 50%, black) 0 -3px 0 inset;
+    color-mix(in hsl, var(--tile-color) 60%, black) 0 -3px 0 inset;
 }
 
 
 .highlight {
-  box-shadow: color-mix(in hsl, var(--tile-color) 50%, black) 0 3px 7px inset;
+  box-shadow: color-mix(in hsl, var(--tile-color) 60%, black) 0 3px 7px inset;
   transform: translateY(2px) scale(0.98);
   z-index: 2;
   /*border-color: yellow;*/
