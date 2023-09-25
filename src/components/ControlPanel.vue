@@ -72,6 +72,7 @@ watch(logs, () => {
 .controls {
   padding: 0 1em;
   min-width: 320px;
+  box-sizing: border-box;
 }
 .logs {
   text-align: left;

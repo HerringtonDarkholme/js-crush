@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { getRandomData } from './data'
 import { addLog, resetLog } from './logs'
-import { chunkTwo } from './utils'
+import { chunkTwo, sleep } from './utils'
 import {reactive, nextTick} from 'vue'
 import ControlPanel from './ControlPanel.vue'
 
@@ -43,10 +43,10 @@ async function moveDown(tableData: Tile[][]) {
           text, color, class: ''
         })
         colIndex += 1
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await sleep(50)
       } else if (row[colIndex].class === 'removing') {
         row.splice(colIndex, 1)
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await sleep(50)
       } else {
         colIndex += 1
       }
@@ -81,19 +81,29 @@ async function startGame(seed: string) {
   });
 }
 
-function pointerDown(rowIndex: number, colIndex: number) {
+function resolveCoordinate(e: PointerEvent) {
+  const target = document.elementFromPoint(e.clientX, e.clientY)!;
+  const row = Number(target.getAttribute('x'))
+  const col = Number(target.getAttribute('y'))
+  return [row, col]
+}
+
+function pointerDown(e: PointerEvent) {
+  const [rowIndex, colIndex] = resolveCoordinate(e)
+  if (isNaN(rowIndex) || isNaN(colIndex)) {
+    return
+  }
   state.startSelect = true
   state.tableData[rowIndex][colIndex].class = 'highlight';
   state.selectedCells.push({ rowIndex, colIndex });
 }
 
-function pointerMove(rowIndex: number, colIndex: number) {
-  if (!state.startSelect || !canSelectTile(state.selectedCells, rowIndex, colIndex)) {
+function pointerMove(e: PointerEvent) {
+  const [rowIndex, colIndex] = resolveCoordinate(e)
+  if (!state.startSelect || isNaN(rowIndex) || isNaN(colIndex) || !canSelectTile(state.selectedCells, rowIndex, colIndex)) {
     return;
   }
-  // 将当前格子的背景色置为蓝色
   state.tableData[rowIndex][colIndex].class = 'highlight';
-  // 将上一个选中的格子的背景色置绿色
   console.assert(state.selectedCells.length > 0)
   let lastTd = state.selectedCells[state.selectedCells.length - 1];
   state.tableData[lastTd.rowIndex][lastTd.colIndex].class = 'selected';
@@ -150,12 +160,11 @@ async function doRemove() {
   });
   for (let {rowIndex, colIndex} of state.selectedCells) {
     const cell = state.tableData[rowIndex][colIndex]
-    // reset text and style
-    cell.class = 'removing';
-    await new Promise(resolve => setTimeout(resolve, 50));
+    cell.class = 'removing'
+    await sleep(50)
   }
-  await new Promise(resolve => setTimeout(resolve, 400));
-  await moveDown(state.tableData);
+  await sleep(400)
+  await moveDown(state.tableData)
 }
 
 const state = reactive({
@@ -169,15 +178,16 @@ const state = reactive({
 
 <template>
   <div class="row">
-    <div id="game" @pointerup="pointerUp">
-      <div class="tiles" v-for="(row, rowIndex) in state.tableData" :key="rowIndex">
-        <div class="tile" v-for="(col, colIndex) in row" :key="colIndex">
-          <div class="card game-card" :class="col.class"
-            @pointerdown="pointerDown(rowIndex, colIndex)"
-            @pointermove="pointerMove(rowIndex, colIndex)"
-            :style="{'--tile-color': col.color}"
-          >
-            {{col.text}}
+    <div class="game-area">
+      <div id="game" @pointerup="pointerUp" @pointerdown="pointerDown" @pointermove="pointerMove">
+        <div class="tiles" v-for="(row, rowIndex) in state.tableData" :key="rowIndex">
+          <div class="tile" v-for="(col, colIndex) in row" :key="colIndex">
+            <div class="card game-card" :class="col.class"
+              :x="rowIndex" :y="colIndex"
+              :style="{'--tile-color': col.color}"
+            >
+              {{col.text}}
+            </div>
           </div>
         </div>
       </div>
@@ -209,6 +219,8 @@ const state = reactive({
     rgba(45, 35, 66, .3) 0 7px 13px -3px,
     color-mix(in hsl, var(--tile-color) 60%, black) 0 -3px 0 inset;
   transform-origin: 50% 50%;
+  white-space: pre-wrap;
+  line-height: 1;
 }
 
 
@@ -250,8 +262,8 @@ const state = reactive({
 }
 
 #game {
-  max-width: 100vmin;
-  font-size: min(14px, 2.5vmin);
+  max-width: min(100vmin, 750px);
+  font-size: min(14px, 2vmin);
   user-select: none;
   font-family: monospace;
   margin: -2px 0;
@@ -260,18 +272,25 @@ const state = reactive({
   display: flex;
   flex-wrap: nowrap;
   flex-direction: row;
-  gap: 2px;
+  gap: 0.5vmin;
 }
 .tiles {
   display: flex;
   flex-wrap: nowrap;
   flex-direction: column-reverse;
   flex: 1 0 0;
-  gap: 2px;
+  gap: 0.5vmin;
   justify-content: flex-start;
 }
 .tile {
   flex: 0 0 0;
+}
+.game-area {
+  flex: 8 0 0;
+  min-width: min(500px, 100vw);
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2em;
 }
 .control-panel {
   flex: 4 0 0;
