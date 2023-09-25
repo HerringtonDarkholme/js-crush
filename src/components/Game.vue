@@ -154,21 +154,18 @@ async function doRemove() {
   const text = [...chunkTwo(selectedText())]
     .map(([prev, curr]) => `${prev} == ${curr}`)
     .join('\n');
-  addLog(text + '\n消除成功！');
+  addLog(text + '\nCrushed!!');
   // 计算得分
-  let turnScore = 1;
-  for (let i = 0; i < state.selectedCells.length; i++) {
-    let {rowIndex, colIndex} = state.selectedCells[i]
+  let len = state.selectedCells.length;
+  let turnScore = 1 + (len - 1) * len / 2;
+  for (let {rowIndex, colIndex} of state.selectedCells) {
     const cell = state.tableData[rowIndex][colIndex]
     // reset text and style
     cell.text = '';
     cell.class = '';
-    turnScore += i;
   }
-  // 计算得分
   state.score += turnScore;
-  addLog('分数增加：' + turnScore);
-  // 将剩余的格子向下移动
+  addLog(`Score +${turnScore}`);
   await moveDown(state.tableData);
 }
 
@@ -193,7 +190,7 @@ const state = reactive({
 
 <template>
   <div class="row">
-    <div class="col-12" id="game">
+    <div id="game">
       <div class="row" v-for="(row, rowIndex) in state.tableData" :key="rowIndex">
         <div class="col px-0" v-for="(col, colIndex) in row" :key="colIndex">
           <div class="card game-card" :class="col.class"
@@ -249,10 +246,9 @@ const state = reactive({
   user-select: none;
   font-family: monospace;
   margin: -2px 0;
-  flex-grow: 8;
+  flex: 8 0 100%;
 }
 .control-panel {
-  flex: 4 0 auto;
-
+  flex: 4 0 0;
 }
 </style>
