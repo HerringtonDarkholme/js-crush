@@ -32,38 +32,23 @@ function initTableData() {
 }
 // 将剩余的格子向下移动
 async function moveDown(tableData: Tile[][]) {
-  let hasEliminated = false;
-  for (let rowIndex = 10 - 1; rowIndex >= 0; rowIndex--) {
-    for (let colIndex = 0; colIndex < 10; colIndex++) {
-      const currentCell = tableData[rowIndex][colIndex]
-      // if currentCell is not empty, skip
-      if (currentCell.text) {
-        continue;
+  for (let rowIndex = 0; rowIndex < 10; rowIndex++) {
+    const row = tableData[rowIndex]
+    let colIndex = 0
+    while (colIndex < 10) {
+      if (colIndex >= row.length) {
+        const [text, color] = getRandomData()
+        row.push({
+          text, color, class: ''
+        })
+        colIndex += 1
+        await new Promise(resolve => setTimeout(resolve, 50));
+      } else if (row[colIndex].class === 'removing') {
+        row.splice(colIndex, 1)
+        await new Promise(resolve => setTimeout(resolve, 50));
+      } else {
+        colIndex += 1
       }
-      hasEliminated = true;
-      // 找到当前格子上面的第一个非空格子
-      let flag = false;
-      for (let i = rowIndex - 1; i >= 0; i--) {
-        const cell = tableData[i][colIndex]
-        // 如果找到了非空格子，则将其表达式填充到当前格子
-        if (cell.text) {
-          currentCell.text = cell.text;
-          currentCell.color = cell.color;
-          tableData[i][colIndex].text = '';
-          tableData[i][colIndex].color = '';
-          flag = true;
-          break;
-        }
-      }
-      if (!flag) {
-        let [text, color] = getRandomData();
-        currentCell.text = text;
-        currentCell.color = color;
-      }
-    }
-    if (hasEliminated) {
-      // delay a little bit for animation
-      await new Promise(resolve => setTimeout(resolve, 50));
     }
   }
 }
@@ -116,13 +101,13 @@ function pointerMove(rowIndex: number, colIndex: number) {
 
 // 松开格子
 async function pointerUp() {
+  state.startSelect = false
   await tryRemove();
   // clear selected cell style
   for (const {rowIndex, colIndex} of state.selectedCells) {
     state.tableData[rowIndex][colIndex].class = '';
   }
   state.selectedCells = [];
-  state.startSelect = false
 }
 
 async function tryRemove() {
@@ -165,9 +150,10 @@ async function doRemove() {
   for (let {rowIndex, colIndex} of state.selectedCells) {
     const cell = state.tableData[rowIndex][colIndex]
     // reset text and style
-    cell.text = '';
-    cell.class = '';
+    cell.class = 'removing';
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
+  await new Promise(resolve => setTimeout(resolve, 400));
   await moveDown(state.tableData);
 }
 
@@ -183,8 +169,8 @@ const state = reactive({
 <template>
   <div class="row">
     <div id="game" @pointerup="pointerUp">
-      <div class="row" v-for="(row, rowIndex) in state.tableData" :key="rowIndex">
-        <div class="col px-0" v-for="(col, colIndex) in row" :key="colIndex">
+      <div class="tiles" v-for="(row, rowIndex) in state.tableData" :key="rowIndex">
+        <div class="tile" v-for="(col, colIndex) in row" :key="colIndex">
           <div class="card game-card" :class="col.class"
             @pointerdown="pointerDown(rowIndex, colIndex)"
             @pointermove="pointerMove(rowIndex, colIndex)"
@@ -204,7 +190,7 @@ const state = reactive({
   aspect-ratio: 1;
   word-break: break-word;
   border-radius: 6px;
-  transition: all 0.1s ease-in-out;
+  transition: all 0.2s ease-in-out;
   border: 1px solid transparent;
   color: black;
   display: flex;
@@ -221,6 +207,7 @@ const state = reactive({
     rgba(45, 35, 66, .4) 0 2px 4px,
     rgba(45, 35, 66, .3) 0 7px 13px -3px,
     color-mix(in hsl, var(--tile-color) 60%, black) 0 -3px 0 inset;
+  transform-origin: 50% 50%;
 }
 
 
@@ -239,6 +226,28 @@ const state = reactive({
   z-index: 1;
   /*border-color: yellow;*/
 }
+.removing {
+  animation: disappear 0.4s linear forwards;
+}
+@keyframes disappear {
+  from {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+  20% {
+    transform: scale(1.05) rotate(-2deg);
+    opacity: 1;
+  }
+  40% {
+    transform: scale(1.05) rotate(-2deg);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0) rotate(-2deg);
+    opacity: 0.5;
+  }
+}
+
 .row {
   gap: 2px;
   margin: 2px 0;
@@ -251,6 +260,22 @@ const state = reactive({
   font-family: monospace;
   margin: -2px 0;
   flex: 8 0 100%;
+  touch-action: none;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  gap: 2px;
+}
+.tiles {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column-reverse;
+  flex: 1 0 0;
+  gap: 2px;
+  justify-content: flex-start;
+}
+.tile {
+  flex: 0 0 0;
 }
 .control-panel {
   flex: 4 0 0;

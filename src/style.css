@@ -83,7 +83,7 @@ h3 {
   a:hover {
     color: #747bff;
   }
-  button {
+  input, button {
     background-color: #f9f9f9;
   }
 }
