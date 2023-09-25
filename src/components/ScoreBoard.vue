@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed, watchEffect, watch } from 'vue'
+import { promotion } from './sound'
 import { addLog } from './logs'
 // TODO: add some JD for these positions
 const titles = [
@@ -47,6 +48,7 @@ watch(() => title.value, (to, from) => {
     type: 'Promotion',
     from, to
   })
+  promotion()
 })
 </script>
 

@@ -3,6 +3,7 @@ import { getRandomData } from './data'
 import { addLog, resetLog } from './logs'
 import { chunkTwo, sleep } from './utils'
 import {reactive, nextTick} from 'vue'
+import { shuffle, tile, correct, wrong } from './sound'
 import ControlPanel from './ControlPanel.vue'
 
 interface Tile {
@@ -73,6 +74,7 @@ function canSelectTile(selectedCells: SelectedCells, row: number, col: number) {
 
 // 开始游戏
 async function startGame(seed: string) {
+  shuffle()
   state.tableData = initTableData()
   state.score = 0
   resetLog(seed)
@@ -93,6 +95,7 @@ function pointerDown(e: PointerEvent) {
   if (isNaN(rowIndex) || isNaN(colIndex)) {
     return
   }
+  tile()
   state.startSelect = true
   state.tableData[rowIndex][colIndex].class = 'highlight';
   state.selectedCells.push({ rowIndex, colIndex });
@@ -103,6 +106,7 @@ function pointerMove(e: PointerEvent) {
   if (!state.startSelect || isNaN(rowIndex) || isNaN(colIndex) || !canSelectTile(state.selectedCells, rowIndex, colIndex)) {
     return;
   }
+  tile()
   state.tableData[rowIndex][colIndex].class = 'highlight';
   console.assert(state.selectedCells.length > 0)
   let lastTd = state.selectedCells[state.selectedCells.length - 1];
@@ -140,7 +144,10 @@ async function tryRemove() {
     }
   }
   if (canRemove) {
+    correct()
     await doRemove()
+  } else {
+    wrong()
   }
 }
 // return the array of selected cell text, normalized
