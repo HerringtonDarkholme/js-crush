@@ -11,14 +11,15 @@ interface Tile {
   color: string,
 }
 
+const SIZE = 8;
 type SelectedCells = {rowIndex: number, colIndex: number}[];
 
 // 初始化表格数据
 function initTableData() {
   const tableData: Tile[][] = [];
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < SIZE; i++) {
     let row = [];
-    for (let j = 0; j < 10; j++) {
+    for (let j = 0; j < SIZE; j++) {
       let [text, color] = getRandomData();
       row.push({
         text: text,
@@ -32,10 +33,10 @@ function initTableData() {
 }
 // 将剩余的格子向下移动
 async function moveDown(tableData: Tile[][]) {
-  for (let rowIndex = 0; rowIndex < 10; rowIndex++) {
+  for (let rowIndex = 0; rowIndex < SIZE; rowIndex++) {
     const row = tableData[rowIndex]
     let colIndex = 0
-    while (colIndex < 10) {
+    while (colIndex < SIZE) {
       if (colIndex >= row.length) {
         const [text, color] = getRandomData()
         row.push({
@@ -151,7 +152,7 @@ async function doRemove() {
     const cell = state.tableData[rowIndex][colIndex]
     // reset text and style
     cell.class = 'removing';
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 50));
   }
   await new Promise(resolve => setTimeout(resolve, 400));
   await moveDown(state.tableData);
@@ -248,14 +249,9 @@ const state = reactive({
   }
 }
 
-.row {
-  gap: 2px;
-  margin: 2px 0;
-}
-
 #game {
-  max-width: min(100vw, 100vh);
-  font-size: min(14px, min(2vw, 2vh));
+  max-width: 100vmin;
+  font-size: min(14px, 2.5vmin);
   user-select: none;
   font-family: monospace;
   margin: -2px 0;
