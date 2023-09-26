@@ -6,7 +6,7 @@ import ControlPanel from './components/ControlPanel.vue'
 
 <template>
   <div class="container mt-3">
-    <h1>JS Crush</h1>
+    <h1 class="intro">JS Crush</h1>
     <div class="row">
       <MainArea class="game-area" />
       <ControlPanel class="control-panel"/>
@@ -16,7 +16,7 @@ import ControlPanel from './components/ControlPanel.vue'
 
 <style scoped>
 .intro {
-  padding: 0 1em;
+  padding: 0 1rem;
   width: 100%;
   box-sizing: border-box;
 }

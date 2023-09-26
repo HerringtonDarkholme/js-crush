@@ -67,6 +67,7 @@ function share() {
 <style scoped>
 .game-area {
   position: relative;
+  min-height: 60vh;
 }
 .intro, .game-over {
   position: absolute;
@@ -77,13 +78,13 @@ function share() {
   display: flex;
   justify-content: center;
   flex-direction: column;
+  padding: 1em;
 }
 .game-over {
   backdrop-filter: blur(3px) grayscale(85%);
   z-index: 3;
   transition: all 0.2s ease-in-out;
   align-items: center;
-  padding: 1em;
 }
 .v-leave-to, .v-enter-from {
   opacity: 0;
