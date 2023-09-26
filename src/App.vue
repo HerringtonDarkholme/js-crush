@@ -8,7 +8,8 @@ import Game from './components/Game.vue'
       <p>
         A parody game inspired by
         <a href="https://www.thomas-yang.me/projects/oh-my-dear-js/"
-        target="_blank">oh-my-dear-js</a>.</p>
+        target="_blank">oh-my-dear-js</a> and
+        <a href="https://js.wdn.md/" target="_blank">nice.js</a>.</p>
       <p>
         Instruction: Click <b>Start</b> to begin your challenge!
         Drag your mouse over two or more nearby tiles that are <code>==</code> to each other.

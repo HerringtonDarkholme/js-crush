@@ -69,6 +69,15 @@ function shareToTwitter() {
     <button class="tweet-button" @click="shareToTwitter">
       Share on 𝕏
     </button>
+    <br/>
+    <br/>
+    <br/>
+    <p>
+      Made by <a href="https://twitter.com/hd_nvim" target="_blank">Herrington Darkholme</a>.
+      <br/>
+      If you like the game, you can support me by giving
+      <a href="https://github.com/ast-grep/ast-grep" target="_blank">my other project</a> a star😉.
+    </p>
   </div>
 </template>
 
