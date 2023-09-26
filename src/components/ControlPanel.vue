@@ -47,13 +47,16 @@ function shareToTwitter() {
 
 <template>
   <div class="controls">
-    <ScoreBoard class="card" :score="score"/>
     <div class="card row">
-      <h3 class="input-group-text">Random Seed</h3>
-      <input type="text" class="form-control" placeholder="Default to timestamp" v-model="seedRef">
       <button class="btn btn-primary" @click="startGame">Start</button>
       <button class="btn" type="button" id="button-addon2"
         @click="seedRef = getNowFormatDate()">Daily Challenge</button>
+    </div>
+    <ScoreBoard class="card" :score="score"/>
+    <div class="card row">
+      <h3 class="input-group-text">RNG Seed</h3>
+      <small>Same seed generates same board</small>
+      <input type="text" class="form-control" placeholder="Default seed is timestamp" v-model="seedRef">
     </div>
     <div class="card">
       <h3 class="card-header">Journal</h3>
@@ -93,6 +96,7 @@ function shareToTwitter() {
   overflow-y: auto;
   border-radius: 8px;
   background-color: #1a1a1a;
+  border: 1px dashed currentColor;
 }
 @media (prefers-color-scheme: light) {
   .logs {
@@ -107,5 +111,9 @@ pre {
 }
 .tweet-button {
   width: 100%;
+}
+small {
+  font-weight: lighter;
+  line-height: 28px;
 }
 </style>

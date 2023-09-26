@@ -24,3 +24,21 @@ I scored 380 points on #JSCrush and got a Junior Engineer title. I learnt JS equ
 I just scored 450 points on #JSCrush and became a Master Engineer. I can handle any JS equality quirks like a boss.
 #JSCrush will make you sweat and laugh with its JS coercion puzzles. I got 360 points and a Junior Engineer title.
 ```
+
+```
+Can you generate some witty, humorous punchline-like description for the engineer title in my JS based puzzle game?
+They are like achieement titles in the game and bring some fun to the game. The punchline should be concise and funny.
+Imagine if the title is introduced on a talk show.
+
+Here are the list
+
+JavaScript Learner
+JavaScript Intern
+Junior Engineer
+Senior Engineer
+Staff Engineer
+Principal Engineer
+JavaScript CTO
+Douglas Crockford
+Brendan Eich
+```

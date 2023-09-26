@@ -14,9 +14,6 @@ import Game from './components/Game.vue'
         Drag your mouse over two or more nearby tiles that are <code>==</code> to each other.
         Release your mouse and watch tiles removed if they are all weakly equal to their neighbors.
       </p>
-      <p>
-      Seed is for generating puzzles. You will always see the same board for the same seed.
-      </p>
     </div>
     <Game/>
   </div>

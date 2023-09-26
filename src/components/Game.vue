@@ -85,6 +85,9 @@ async function startGame(seed: string) {
 
 function resolveCoordinate(e: PointerEvent) {
   const target = document.elementFromPoint(e.clientX, e.clientY)!;
+  if (!target.classList.contains('game-card')) {
+    return [NaN, NaN]
+  }
   const row = Number(target.getAttribute('x'))
   const col = Number(target.getAttribute('y'))
   return [row, col]
@@ -162,7 +165,7 @@ function selectedText() {
 }
 async function doRemove() {
   let len = state.selectedCells.length;
-  let turnScore = 1 + (len - 1) * len / 2;
+  let turnScore = 10 + (len - 1) * len / 2 * 10;
   state.score += turnScore;
   addLog({
     type: 'Crushed',
@@ -225,13 +228,19 @@ const state = reactive({
       var(--tile-color) 0,
       color-mix(in hsl, var(--tile-color) 80%, black) 100%
     );
+  --shadow: rgb(236, 233, 186);
   box-shadow:
-    rgba(45, 35, 66, .4) 0 2px 4px,
-    rgba(45, 35, 66, .3) 0 7px 13px -3px,
+    color-mix(in srgb, var(--shadow) 40%, transparent) 0 2px 4px,
+    color-mix(in srgb, var(--shadow) 30%, transparent) 0 7px 13px -3px,
     color-mix(in hsl, var(--tile-color) 60%, black) 0 -3px 0 inset;
   transform-origin: 50% 50%;
   white-space: pre-wrap;
   line-height: 1;
+}
+@media (prefers-color-scheme: light) {
+  .game-card {
+    --shadow: rgb(45, 35, 66);
+  }
 }
 
 
@@ -244,14 +253,15 @@ const state = reactive({
 .selected {
   transform: translateY(-2px);
   box-shadow:
-    rgba(45, 35, 66, .4) 0 4px 8px,
-    rgba(45, 35, 66, .3) 0 7px 13px -3px,
+    color-mix(in srgb, var(--shadow) 40%, transparent) 0 4px 8px,
+    color-mix(in srgb, var(--shadow) 30%, transparent) 0 7px 13px -3px,
     color-mix(in hsl, var(--tile-color) 50%, black) 0 -3px 0 inset;
   z-index: 1;
   /*border-color: yellow;*/
 }
 .removing {
   animation: disappear 0.4s linear forwards;
+  --shadow: green;
 }
 @keyframes disappear {
   from {
@@ -274,6 +284,7 @@ const state = reactive({
 
 .wrong-select {
   animation: shake 0.5s ease-in-out 0s;
+  --shadow: red;
 }
 
 @keyframes shake {
@@ -294,14 +305,14 @@ const state = reactive({
   display: flex;
   flex-wrap: nowrap;
   flex-direction: row;
-  gap: 0.5vmin;
+  gap: min(0.8vmin, 6px);
 }
 .tiles {
   display: flex;
   flex-wrap: nowrap;
   flex-direction: column-reverse;
   flex: 1 0 0;
-  gap: 0.5vmin;
+  gap: min(0.8vmin, 6px);
   justify-content: flex-start;
 }
 .tile {
