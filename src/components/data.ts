@@ -1,44 +1,44 @@
 import seedrandom from 'seedrandom'
 
-// [text, hue]
-const exprData = [
+// text: [valFunc, hue]
+const exprData = {
   // keyword
-  ['null', 0],
-  ['undefined', 0],
-  ['false', 0],
-  ['true', 0],
+  'null': [() => null, 0],
+  'undefined': [() => undefined, 0],
+  'false': [() => false, 0],
+  'true': [() => true, 0],
   // string
-  ['""', 50],
-  ['"0"', 50],
-  ['"1"', 50],
-  ['"-1"', 50],
+  '""': [() => "", 50],
+  '"0"': [() => "0", 50],
+  '"1"': [() => "1", 50],
+  '"-1"': [() => "-1", 50],
   // number
-  ['-1', 100],
-  ['0', 100],
-  ['1', 100],
+  '-1': [() => -1, 100],
+  '0': [() => 0, 100],
+  '1': [() => 1, 100],
   // Boolean
-  ['Boolean\n(false)', 150],
-  ['Boolean\n(true)', 150],
+  'Boolean(false)': [() => Boolean(false), 150],
+  'Boolean(true)': [() => Boolean(true), 150],
   // Number
-  ['Number\n(-1)', 200],
-  ['Number\n(0)', 200],
-  ['Number\n(1)', 200],
+  'Number(-1)': [() => Number(-1), 200],
+  'Number(0)': [() => Number(0), 200],
+  'Number(1)': [() => Number(1), 200],
   // String
-  ['String\n("")', 250],
-  ['String\n("-1")', 250],
-  ['String\n("0")', 250],
-  ['String\n("1")', 250],
+  'String("")': [() => String(""), 250],
+  'String("-1")': [() => String("-1"), 250],
+  'String("0")': [() => String("0"), 250],
+  'String("1")': [() => String("1"), 250],
   // Array
-  ['[-1]', 300],
-  ['[0]', 300],
-  ['[1]', 300],
-  ['[[]]', 300],
-  ['[]', 300],
-] as const;
+  '[-1]': [() => [-1], 300],
+  '[0]': [() => [0], 300],
+  '[1]': [() => [1], 300],
+  '[[]]': [() => [[]], 300],
+  '[]': [ () => [], 300],
+} as const;
 
-const colorData = exprData.map(([text, hue]) => [text, getRandomColor(hue)])
+const colorData = Object.entries(exprData)
+  .map(([text, v]) => [text.replace(/\(/, '\n('), getRandomColor(v[1])])
 
-// 生成低饱和度的浅彩色十六进制
 // hue 0~360
 // staturation 50%~100%
 // lightness 80%~95%
@@ -53,12 +53,16 @@ function percentage(n: number) {
   return Math.floor(n * 100)
 }
 
-// 获取随机的表达式和颜色
 export function getRandomData() {
-  let r = Math.floor(Math.random() * exprData.length);
+  let r = Math.floor(Math.random() * colorData.length);
   return colorData[r];
 }
 
 export function setSeed(seed: string) {
   seedrandom(seed, { global: true})
+}
+
+export function isEqual(t1: string, t2: string) {
+  // @ts-expect-error
+  return exprData[t1][0]() == exprData[t2][0]()
 }

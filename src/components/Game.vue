@@ -1,37 +1,11 @@
 <script lang="ts" setup>
-import { getRandomData } from './data'
-import { addLog, resetLog } from './logs'
+import { getRandomData, isEqual } from './data'
+import { addLog, addScore, Tile, SIZE, tableData } from './state'
 import { chunkTwo, sleep } from './utils'
-import {reactive, nextTick} from 'vue'
-import { shuffle, tile, correct, wrong } from './sound'
-import ControlPanel from './ControlPanel.vue'
+import {reactive} from 'vue'
+import { tile, correct, wrong } from './sound'
 
-interface Tile {
-  text: string,
-  class: string,
-  color: string,
-}
-
-const SIZE = 8;
 type SelectedCells = {rowIndex: number, colIndex: number}[];
-
-// 初始化表格数据
-function initTableData() {
-  const tableData: Tile[][] = [];
-  for (let i = 0; i < SIZE; i++) {
-    let row = [];
-    for (let j = 0; j < SIZE; j++) {
-      let [text, color] = getRandomData();
-      row.push({
-        text: text,
-        class: '',
-        color: color,
-      });
-    }
-    tableData.push(row);
-  }
-  return tableData
-}
 // 将剩余的格子向下移动
 async function moveDown(tableData: Tile[][]) {
   for (let rowIndex = 0; rowIndex < SIZE; rowIndex++) {
@@ -72,17 +46,6 @@ function canSelectTile(selectedCells: SelectedCells, row: number, col: number) {
   return isAdjacent
 }
 
-// 开始游戏
-async function startGame(seed: string) {
-  shuffle()
-  state.tableData = initTableData()
-  state.score = 0
-  resetLog(seed)
-  nextTick(() => {
-    document.getElementById('game')!.scrollIntoView();
-  });
-}
-
 function resolveCoordinate(e: PointerEvent) {
   const target = document.elementFromPoint(e.clientX, e.clientY)!;
   if (!target.classList.contains('game-card')) {
@@ -100,7 +63,7 @@ function pointerDown(e: PointerEvent) {
   }
   tile()
   state.startSelect = true
-  state.tableData[rowIndex][colIndex].class = 'highlight';
+  tableData.value[rowIndex][colIndex].class = 'highlight';
   state.selectedCells.push({ rowIndex, colIndex });
 }
 
@@ -110,10 +73,10 @@ function pointerMove(e: PointerEvent) {
     return;
   }
   tile()
-  state.tableData[rowIndex][colIndex].class = 'highlight';
+  tableData.value[rowIndex][colIndex].class = 'highlight';
   console.assert(state.selectedCells.length > 0)
   let lastTd = state.selectedCells[state.selectedCells.length - 1];
-  state.tableData[lastTd.rowIndex][lastTd.colIndex].class = 'selected';
+  tableData.value[lastTd.rowIndex][lastTd.colIndex].class = 'selected';
   state.selectedCells.push({ rowIndex, colIndex });
 }
 
@@ -123,7 +86,7 @@ async function pointerUp() {
   await tryRemove();
   // clear selected cell style
   for (const {rowIndex, colIndex} of state.selectedCells) {
-    state.tableData[rowIndex][colIndex].class = '';
+    tableData.value[rowIndex][colIndex].class = '';
   }
   state.selectedCells = [];
 }
@@ -136,7 +99,7 @@ async function tryRemove() {
   const text = selectedText()
   let canRemove = true;
   for (let [prevText, currentText] of chunkTwo(text)) {
-    if (eval(currentText) != eval(prevText)) {
+    if (!isEqual(prevText, currentText)) {
       canRemove = false;
       addLog({
         type: 'NoCrush',
@@ -151,7 +114,7 @@ async function tryRemove() {
     await doRemove()
   } else {
     for (let {rowIndex, colIndex} of state.selectedCells) {
-      state.tableData[rowIndex][colIndex].class = 'wrong-select'
+      tableData.value[rowIndex][colIndex].class = 'wrong-select'
     }
     wrong()
     await sleep(500)
@@ -160,53 +123,39 @@ async function tryRemove() {
 // return the array of selected cell text, normalized
 function selectedText() {
   return state.selectedCells.map(({rowIndex, colIndex}) => {
-    return state.tableData[rowIndex][colIndex].text.replace(/\n/g, '')
+    return tableData.value[rowIndex][colIndex].text.replace(/\n/g, '')
   });
 }
 async function doRemove() {
-  let len = state.selectedCells.length;
-  let turnScore = 10 + (len - 1) * len / 2 * 10;
-  state.score += turnScore;
-  addLog({
-    type: 'Crushed',
-    selectedText: selectedText(),
-    turnScore,
-  });
+  addScore(selectedText())
   for (let {rowIndex, colIndex} of state.selectedCells) {
-    const cell = state.tableData[rowIndex][colIndex]
+    const cell = tableData.value[rowIndex][colIndex]
     cell.class = 'removing'
     await sleep(50)
   }
   await sleep(400)
-  await moveDown(state.tableData)
+  await moveDown(tableData.value)
 }
 
 const state = reactive({
   startSelect: false,
-  tableData: [] as Tile[][],
   selectedCells: [] as SelectedCells,
-  score: 0,
 })
 
 </script>
 
 <template>
-  <div class="row">
-    <div class="game-area">
-      <div id="game" @pointerup="pointerUp" @pointerdown="pointerDown" @pointermove="pointerMove">
-        <div class="tiles" v-for="(row, rowIndex) in state.tableData" :key="rowIndex">
-          <div class="tile" v-for="(col, colIndex) in row" :key="colIndex">
-            <div class="card game-card" :class="col.class"
-              :x="rowIndex" :y="colIndex"
-              :style="{'--tile-color': col.color}"
-            >
-              {{col.text}}
-            </div>
-          </div>
+  <div id="game" @pointerup="pointerUp" @pointerdown="pointerDown" @pointermove="pointerMove">
+    <div class="tiles" v-for="(row, rowIndex) in tableData" :key="rowIndex">
+      <div class="tile" v-for="(col, colIndex) in row" :key="colIndex">
+        <div class="card game-card" :class="col.class"
+          :x="rowIndex" :y="colIndex"
+          :style="{'--tile-color': col.color}"
+        >
+          {{col.text}}
         </div>
       </div>
     </div>
-    <ControlPanel class="control-panel" :score="state.score" @startGame="startGame"/>
   </div>
 </template>
 
@@ -248,7 +197,6 @@ const state = reactive({
   box-shadow: color-mix(in hsl, var(--tile-color) 60%, black) 0 3px 7px inset;
   transform: translateY(2px) scale(0.98);
   z-index: 2;
-  /*border-color: yellow;*/
 }
 .selected {
   transform: translateY(-2px);
@@ -257,7 +205,6 @@ const state = reactive({
     color-mix(in srgb, var(--shadow) 30%, transparent) 0 7px 13px -3px,
     color-mix(in hsl, var(--tile-color) 50%, black) 0 -3px 0 inset;
   z-index: 1;
-  /*border-color: yellow;*/
 }
 .removing {
   animation: disappear 0.4s linear forwards;
@@ -317,15 +264,5 @@ const state = reactive({
 }
 .tile {
   flex: 0 0 0;
-}
-.game-area {
-  flex: 8 0 0;
-  min-width: min(500px, 100vw);
-  display: flex;
-  justify-content: center;
-  margin-bottom: 2em;
-}
-.control-panel {
-  flex: 4 0 0;
 }
 </style>

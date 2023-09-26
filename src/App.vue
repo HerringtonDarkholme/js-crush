@@ -1,6 +1,20 @@
 <script setup lang="ts">
-import Game from './components/Game.vue'
+import { nextTick} from 'vue'
+import MainArea from './components/MainArea.vue'
+import ControlPanel from './components/ControlPanel.vue'
+import { startNewGame } from './components/state'
+import { shuffle } from './components/sound'
+
+// 开始游戏
+async function startGame(seed: string) {
+  shuffle()
+  startNewGame(seed)
+  nextTick(() => {
+    document.getElementById('game')!.scrollIntoView();
+  });
+}
 </script>
+
 <template>
   <div class="container mt-3">
     <div class="intro">
@@ -16,7 +30,10 @@ import Game from './components/Game.vue'
         Release your mouse and watch tiles removed if they are all weakly equal to their neighbors.
       </p>
     </div>
-    <Game/>
+    <div class="row">
+      <MainArea class="game-area" />
+      <ControlPanel class="control-panel" @startGame="startGame"/>
+    </div>
   </div>
 </template>
 
@@ -31,5 +48,15 @@ p {
 }
 sub {
   margin-top: -10em;
+}
+.control-panel {
+  flex: 4 0 0;
+}
+.game-area {
+  flex: 8 0 0;
+  min-width: min(500px, 100vw);
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2em;
 }
 </style>

@@ -1,68 +1,33 @@
 <script lang="ts" setup>
-import { ref, computed, watchEffect, watch } from 'vue'
+import { ref, watchEffect, watch } from 'vue'
 import { promotion } from './sound'
-import { addLog } from './logs'
-const titles = [
-  [0, 'JavaScript Learner', 'Know how to `console.log("hello world")`? Congrats!'],
-  [100, 'JavaScript Intern', 'console.log and alert are your best friend.'],
-  [250, 'Junior Engineer', 'Functions and Loops are Bread and Butter.'],
-  [500, 'Senior Engineer', 'You mastered frameworks and libraries!? What about == equality?'],
-  [1000, 'Staff Engineer', 'You, a leader, a mentor and a semicolon judge.'],
-  [2000, 'Principal Engineer', 'Build visionary JS app and JS meme.'],
-  [5000, 'JavaScript CTO', 'You are the boss of JavaScript!'],
-  [10000, 'Douglas Crockford', 'You are the legend of JavaScript! The game is a tribute to JS the good part.'],
-  [39262, 'TC39 Member', 'The future (rule) of this game is in your hand.'],
-  [50000, 'Brendan Eich', 'My Lord, you invented the language in 10 days.'],
-] as const
-let props = defineProps({
-  score: {
-    type: Number,
-    required: true,
-  },
-})
+import { addLog, score, title } from './state'
+
 let maxScore = ref(0)
 let displayScore = ref(0)
 let displayMaxScore = ref(0)
-let title = computed(() => {
-  let left = 0
-  let right = titles.length - 1
-  while (left < right) {
-    let mid = left + Math.floor((right - left) / 2)
-    if (titles[mid][0] < props.score) {
-      left = mid + 1
-    } else {
-      right = mid
-    }
-  }
-  if (props.score < titles[left][0]) {
-    console.assert(left > 0)
-    return titles[left - 1]
-  } else {
-    return titles[left]
-  }
-})
-// TODO: add score effect
+
 watchEffect(() => {
-  maxScore.value = Math.max(props.score, maxScore.value)
+  maxScore.value = Math.max(score.value, maxScore.value)
 })
 
 const DURATION = 1000
 let scoreUpdate = 0
 let maxUpdate = 0
 function updateDisplay() {
-  if (displayScore.value !== props.score) {
-    displayScore.value = Math.min(displayScore.value + scoreUpdate, props.score)
+  if (displayScore.value !== score.value) {
+    displayScore.value = Math.min(displayScore.value + scoreUpdate, score.value)
     requestAnimationFrame(updateDisplay)
   }
   if (maxScore.value !== displayMaxScore.value) {
     displayMaxScore.value = Math.min(displayMaxScore.value + maxUpdate, maxScore.value)
   }
 }
-watch(() => props.score, () => {
-  if (props.score === 0) {
+watch(() => score.value, () => {
+  if (score.value === 0) {
     displayScore.value = 0
   }
-  scoreUpdate = Math.max(Math.floor((props.score - displayScore.value) * 16 / DURATION), 1)
+  scoreUpdate = Math.max(Math.floor((score.value - displayScore.value) * 16 / DURATION), 1)
   maxUpdate = Math.max(Math.floor((maxScore.value - displayMaxScore.value) * 16 / DURATION), 1)
   requestAnimationFrame(updateDisplay)
 })

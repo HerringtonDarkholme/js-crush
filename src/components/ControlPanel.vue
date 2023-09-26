@@ -1,15 +1,9 @@
 <script lang="ts" setup>
 import { setSeed } from './data'
-import { getNowFormatDate } from './utils'
 import {ref, watch, nextTick} from 'vue'
 import ScoreBoard from './ScoreBoard.vue'
-import { logs } from './logs'
-let props = defineProps({
-  score: {
-    type: Number,
-    required: true,
-  },
-})
+import { logs, score, title } from './state'
+import { shareToTwitter } from './utils'
 let emit = defineEmits<{
   startGame: [s: string]
 }>()
@@ -20,7 +14,7 @@ function startGame() {
   let seed = seedRef.value;
   if (!seed) {
     // default to timestamp
-    seed = new Date().getTime().toString();
+    seed = Date.now().toString(36);
   }
   setSeed(seed);
   emit('startGame', seed)
@@ -29,18 +23,16 @@ function startGame() {
 watch(logs, () => {
   nextTick(() => {
     let log = document.getElementById('log')!;
-    log.scrollTop = log.scrollHeight;
+    log.scrollTo({
+      top: log.scrollHeight,
+      behavior: 'smooth'
+    })
   });
 }, {deep: true})
 
-function shareToTwitter() {
-  // Encode the url and message as query parameters
-  const encodedUrl = encodeURIComponent(location.href);
-  const encodedMessage = encodeURIComponent(`I scored ${props.score} points on #JSCrush! I can handle JavaScript coercion like a pro.`);
-  // Construct the Twitter share url with the query parameters
-  const twitterUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedMessage}`;
-  // Open a new window with the Twitter share url
-  window.open(twitterUrl, "_blank");
+function share() {
+  const message = `I scored ${score.value} points on #JSCrush as a ${title.value[1]}!`
+  shareToTwitter(message)
 }
 
 </script>
@@ -49,14 +41,12 @@ function shareToTwitter() {
   <div class="controls">
     <div class="card row">
       <button class="btn btn-primary" @click="startGame">Start</button>
-      <button class="btn" type="button" id="button-addon2"
-        @click="seedRef = getNowFormatDate()">Daily Challenge</button>
     </div>
-    <ScoreBoard class="card" :score="score"/>
+    <ScoreBoard class="card"/>
     <div class="card row">
       <h3 class="input-group-text">RNG Seed</h3>
       <small>Same seed generates same board</small>
-      <input type="text" class="form-control" placeholder="Default seed is timestamp" v-model="seedRef">
+      <input type="text" class="form-control" placeholder="Default seed is hex timestamp" v-model="seedRef">
     </div>
     <div class="card">
       <h3 class="card-header">Journal</h3>
@@ -66,7 +56,7 @@ function shareToTwitter() {
         </div>
       </div>
     </div>
-    <button class="tweet-button" @click="shareToTwitter">
+    <button class="tweet-button" @click="share">
       Share on 𝕏
     </button>
     <br/>
