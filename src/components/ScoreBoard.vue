@@ -44,6 +44,15 @@ watch(() => title.value[1], (to, from) => {
   promotion()
   setTimeout(() => showPromotion.value = false, 800)
 })
+
+let showDecrease = ref(false)
+watch(() => life.value, (to, from) => {
+  console.log(to, from)
+  if (from > to) {
+    showDecrease.value = true
+  }
+  setTimeout(() => showDecrease.value = false, 400)
+})
 </script>
 
 <template>
@@ -53,6 +62,9 @@ watch(() => title.value[1], (to, from) => {
         {{title[1]}} {{life}}
         <transition>
           <span class="up" v-if="showPromotion">↑</span>
+        </transition>
+        <transition>
+          <span class="down" v-if="showDecrease">-1</span>
         </transition>
       </em>
     </div>
@@ -81,6 +93,12 @@ watch(() => title.value[1], (to, from) => {
   font-weight: bold;
   font-size: 1.2em;
   color: #00c805;
+}
+.down {
+  transition: all 0.2s ease;
+  position: absolute;
+  font-weight: bold;
+  color: #ff5000;
 }
 .v-enter-from {
   transform: translateY(25%);
