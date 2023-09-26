@@ -147,7 +147,11 @@ async function tryRemove() {
     correct()
     await doRemove()
   } else {
+    for (let {rowIndex, colIndex} of state.selectedCells) {
+      state.tableData[rowIndex][colIndex].class = 'wrong-select'
+    }
     wrong()
+    await sleep(500)
   }
 }
 // return the array of selected cell text, normalized
@@ -266,6 +270,17 @@ const state = reactive({
     transform: scale(0) rotate(-2deg);
     opacity: 0.5;
   }
+}
+
+.wrong-select {
+  animation: shake 0.5s ease-in-out 0s;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(3px); }
+  75% { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
 }
 
 #game {

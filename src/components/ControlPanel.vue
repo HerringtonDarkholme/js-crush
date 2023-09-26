@@ -4,7 +4,7 @@ import { getNowFormatDate } from './utils'
 import {ref, watch, nextTick} from 'vue'
 import ScoreBoard from './ScoreBoard.vue'
 import { logs } from './logs'
-defineProps({
+let props = defineProps({
   score: {
     type: Number,
     required: true,
@@ -33,6 +33,16 @@ watch(logs, () => {
   });
 }, {deep: true})
 
+function shareToTwitter() {
+  // Encode the url and message as query parameters
+  const encodedUrl = encodeURIComponent(location.href);
+  const encodedMessage = encodeURIComponent(`I scored ${props.score} points on #JSCrush! I can handle JavaScript coercion like a pro.`);
+  // Construct the Twitter share url with the query parameters
+  const twitterUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedMessage}`;
+  // Open a new window with the Twitter share url
+  window.open(twitterUrl, "_blank");
+}
+
 </script>
 
 <template>
@@ -53,6 +63,9 @@ watch(logs, () => {
         </div>
       </div>
     </div>
+    <button class="tweet-button" @click="shareToTwitter">
+      Share on 𝕏
+    </button>
   </div>
 </template>
 
@@ -76,13 +89,23 @@ watch(logs, () => {
 }
 .logs {
   text-align: left;
-  max-height: 9em;
+  height: 9em;
   overflow-y: auto;
+  border-radius: 8px;
+  background-color: #1a1a1a;
+}
+@media (prefers-color-scheme: light) {
+  .logs {
+    background-color: #f9f9f9;
+  }
 }
 pre {
   margin: 0;
-  padding: 0.5em 0;
+  padding: 0.5em;
   border-bottom: 1px dashed currentColor;
   white-space: pre-wrap;
+}
+.tweet-button {
+  width: 100%;
 }
 </style>

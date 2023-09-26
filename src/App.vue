@@ -3,29 +3,32 @@ import Game from './components/Game.vue'
 </script>
 <template>
   <div class="container mt-3">
-    <div class="row">
-      <div class="col-12">
-        <div class="alert alert-info" role="alert">
-          <h1>JS Crush</h1>
-          <p>
-            A parody game inspired by
-            <a href="https://www.thomas-yang.me/projects/oh-my-dear-js/"
-            target="_blank">oh-my-dear-js</a>.</p>
-          <p>
-            Instruction: Click <b>Start</b> to begin your challenge!
-            Click and Swipe tiles and make sure two neighbor tiles are `==`.
-            Release your swipe and eliminate all tiles if they are all weakly equal to their neighbors.
-          </p>
-          <p> Note, only two adjacent tiles are compared.
-          That means that even if <code>String("") != [0]</code>,  you can eliminate
-          all three tiles by following the path <code>String("") -> Number(0) -> [0]</code>.
-          </p>
-          <p>
-          Seed is for generating puzzles. You will always see the same board for the same seed.
-          </p>
-        </div>
-      </div>
+    <div class="intro">
+      <h1>JS Crush</h1>
+      <p>
+        A parody game inspired by
+        <a href="https://www.thomas-yang.me/projects/oh-my-dear-js/"
+        target="_blank">oh-my-dear-js</a>.</p>
+      <p>
+        Instruction: Click <b>Start</b> to begin your challenge!
+        Drag your mouse over two or more nearby tiles that are <code>==</code> to each other.
+        Release your mouse and watch tiles removed if they are all weakly equal to their neighbors.
+      </p>
+      <p>
+      Seed is for generating puzzles. You will always see the same board for the same seed.
+      </p>
     </div>
     <Game/>
   </div>
 </template>
+
+<style scoped>
+.intro {
+  padding: 0 1em;
+  width: 100%;
+  box-sizing: border-box;
+}
+p {
+  width: 100%;
+}
+</style>
