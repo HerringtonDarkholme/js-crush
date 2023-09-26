@@ -6,7 +6,7 @@ import Game from './components/Game.vue'
     <div class="intro">
       <h1>JS Crush</h1>
       <p>
-        A parody game inspired by
+        A bizarre JS-Equality puzzle inspired by
         <a href="https://www.thomas-yang.me/projects/oh-my-dear-js/"
         target="_blank">oh-my-dear-js</a> and
         <a href="https://js.wdn.md/" target="_blank">nice.js</a>.</p>
@@ -28,5 +28,8 @@ import Game from './components/Game.vue'
 }
 p {
   width: 100%;
+}
+sub {
+  margin-top: -10em;
 }
 </style>
