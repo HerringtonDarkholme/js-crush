@@ -1,24 +1,7 @@
 <script lang="ts" setup>
-import { setSeed } from './data'
-import {ref, watch, nextTick} from 'vue'
+import {watch, nextTick} from 'vue'
 import ScoreBoard from './ScoreBoard.vue'
-import { logs, score, title } from './state'
-import { shareToTwitter } from './utils'
-let emit = defineEmits<{
-  startGame: [s: string]
-}>()
-let seedRef = ref('')
-
-function startGame() {
-  // init seed
-  let seed = seedRef.value;
-  if (!seed) {
-    // default to timestamp
-    seed = Date.now().toString(36);
-  }
-  setSeed(seed);
-  emit('startGame', seed)
-}
+import { logs, startNewGame, seedRef } from './state'
 // scroll logs to bottom to show latest update
 watch(logs, () => {
   nextTick(() => {
@@ -30,18 +13,10 @@ watch(logs, () => {
   });
 }, {deep: true})
 
-function share() {
-  const message = `I scored ${score.value} points on #JSCrush as a ${title.value[1]}!`
-  shareToTwitter(message)
-}
-
 </script>
 
 <template>
   <div class="controls">
-    <div class="card row">
-      <button class="btn btn-primary" @click="startGame">Start</button>
-    </div>
     <ScoreBoard class="card"/>
     <div class="card row">
       <h3 class="input-group-text">RNG Seed</h3>
@@ -56,9 +31,6 @@ function share() {
         </div>
       </div>
     </div>
-    <button class="tweet-button" @click="share">
-      Share on 𝕏
-    </button>
     <br/>
     <br/>
     <br/>
@@ -66,7 +38,7 @@ function share() {
       Made by <a href="https://twitter.com/hd_nvim" target="_blank">Herrington Darkholme</a>.
       <br/>
       If you like the game, you can support me by giving
-      <a href="https://github.com/ast-grep/ast-grep" target="_blank">my other project</a> a star😉.
+      <a href="https://github.com/ast-grep/ast-grep" target="_blank">ast-grep</a> a star😉.
     </p>
   </div>
 </template>

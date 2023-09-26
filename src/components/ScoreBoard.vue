@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, watchEffect, watch } from 'vue'
 import { promotion } from './sound'
-import { addLog, score, title } from './state'
+import { addLog, score, title, life } from './state'
 
 let maxScore = ref(0)
 let displayScore = ref(0)
@@ -50,7 +50,7 @@ watch(() => title.value[1], (to, from) => {
   <div class="card">
     <div class="js-title">
       <em :title="title[2]">
-        {{title[1]}}
+        {{title[1]}} {{life}}
         <transition>
           <span class="up" v-if="showPromotion">↑</span>
         </transition>

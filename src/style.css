@@ -55,8 +55,10 @@ input, button {
   font-weight: 500;
   font-family: inherit;
   background-color: #1a1a1a;
-  cursor: pointer;
   transition: border-color 0.25s;
+}
+button {
+  cursor: pointer;
 }
 button:hover {
   border-color: #646cff;

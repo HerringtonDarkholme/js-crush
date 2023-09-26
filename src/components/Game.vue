@@ -56,20 +56,22 @@ function resolveCoordinate(e: PointerEvent) {
   return [row, col]
 }
 
+let startSelect = false
+
 function pointerDown(e: PointerEvent) {
   const [rowIndex, colIndex] = resolveCoordinate(e)
   if (isNaN(rowIndex) || isNaN(colIndex)) {
     return
   }
   tile()
-  state.startSelect = true
+  startSelect = true
   tableData.value[rowIndex][colIndex].class = 'highlight';
   state.selectedCells.push({ rowIndex, colIndex });
 }
 
 function pointerMove(e: PointerEvent) {
   const [rowIndex, colIndex] = resolveCoordinate(e)
-  if (!state.startSelect || isNaN(rowIndex) || isNaN(colIndex) || !canSelectTile(state.selectedCells, rowIndex, colIndex)) {
+  if (!startSelect || isNaN(rowIndex) || isNaN(colIndex) || !canSelectTile(state.selectedCells, rowIndex, colIndex)) {
     return;
   }
   tile()
@@ -82,7 +84,7 @@ function pointerMove(e: PointerEvent) {
 
 // 松开格子
 async function pointerUp() {
-  state.startSelect = false
+  startSelect = false
   await tryRemove();
   // clear selected cell style
   for (const {rowIndex, colIndex} of state.selectedCells) {
@@ -138,7 +140,6 @@ async function doRemove() {
 }
 
 const state = reactive({
-  startSelect: false,
   selectedCells: [] as SelectedCells,
 })
 
@@ -242,12 +243,10 @@ const state = reactive({
 }
 
 #game {
-  max-width: min(100vmin, 750px);
+  width: min(100vmin, 750px);
   font-size: min(14px, 2vmin);
   user-select: none;
   font-family: monospace;
-  margin: -2px 0;
-  flex: 8 0 100%;
   touch-action: none;
   display: flex;
   flex-wrap: nowrap;

@@ -3,6 +3,7 @@
 import { ref, computed } from 'vue'
 import { chunkTwo } from './utils'
 import { getRandomData } from './data'
+import { setSeed } from './data'
 
 export interface Tile {
   text: string,
@@ -53,10 +54,13 @@ type Log =
 
 export const logs = ref([] as string[])
 
+export let life = ref(10)
+
 export function addLog(log: Log) {
   let logStr = ''
   switch (log.type) {
     case 'NoCrush': {
+      life.value -= 1
       logStr = `${log.prevText} != ${log.currentText}\nNo Crush...`
       break
     }
@@ -69,6 +73,7 @@ export function addLog(log: Log) {
       break
     }
     case 'Promotion': {
+      life.value += 5
       logStr = `Congratulation! You have been promoted \nfrom ${log.from} \nto ${log.to} `
       break
     }
@@ -76,7 +81,16 @@ export function addLog(log: Log) {
   logs.value.push(logStr)
 }
 
-export function startNewGame(seed: string) {
+export let seedRef = ref('')
+export function startNewGame() {
+  // init seed
+  let seed = seedRef.value;
+  if (!seed) {
+    // default to timestamp
+    seed = Date.now().toString(36);
+  }
+  life.value = 10
+  setSeed(seed);
   initTableData()
   logs.value = [`Game Seed: ${seed}`]
 }
@@ -125,3 +139,4 @@ export let title = computed(() => {
     return titles[left]
   }
 })
+
