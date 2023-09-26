@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {watch, nextTick} from 'vue'
 import ScoreBoard from './ScoreBoard.vue'
-import { logs, startNewGame, seedRef } from './state'
+import { logs, seedRef } from './state'
 // scroll logs to bottom to show latest update
 watch(logs, () => {
   nextTick(() => {
