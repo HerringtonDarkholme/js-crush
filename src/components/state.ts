@@ -91,6 +91,7 @@ export function startNewGame() {
     seed = Date.now().toString(36);
   }
   life.value = 5
+  score.value = 0
   setSeed(seed);
   initTableData()
   logs.value = [`Game Seed: ${seed}`]
