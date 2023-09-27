@@ -54,7 +54,7 @@ type Log =
 
 export const logs = ref([] as string[])
 
-export let life = ref(10)
+export let life = ref(5)
 
 export function addLog(log: Log) {
   let logStr = ''
@@ -73,7 +73,7 @@ export function addLog(log: Log) {
       break
     }
     case 'Promotion': {
-      life.value += 5
+      life.value += 3
       logStr = `Congratulation! You have been promoted \nfrom ${log.from} \nto ${log.to} `
       break
     }
@@ -89,7 +89,7 @@ export function startNewGame() {
     // default to timestamp
     seed = Date.now().toString(36);
   }
-  life.value = 10
+  life.value = 5
   setSeed(seed);
   initTableData()
   logs.value = [`Game Seed: ${seed}`]
