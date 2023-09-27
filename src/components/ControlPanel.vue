@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {watch, nextTick} from 'vue'
 import ScoreBoard from './ScoreBoard.vue'
-import { logs, seedRef } from './state'
+import { logs, seedRef, share } from './state'
 // scroll logs to bottom to show latest update
 watch(logs, () => {
   nextTick(() => {
@@ -31,6 +31,9 @@ watch(logs, () => {
         </div>
       </div>
     </div>
+    <button class="btn" @click="share">
+      Share on 𝕏
+    </button>
     <br/>
     <br/>
     <br/>
@@ -51,7 +54,7 @@ watch(logs, () => {
   gap: 1em;
 }
 .btn {
-  flex: 1 0 30%;
+  width: 100%;
 }
 .form-control {
   width: 100%;

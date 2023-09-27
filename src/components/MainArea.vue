@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import Game from './Game.vue';
-import { shareToTwitter } from './utils'
-import { startNewGame, score, title, life } from './state'
+import { startNewGame, score, title, life, share } from './state'
 import { shuffle } from './sound'
 import { nextTick, ref} from 'vue'
 
@@ -20,10 +19,6 @@ async function startGame() {
   nextTick(() => {
     document.getElementById('game')!.scrollIntoView();
   });
-}
-function share() {
-  const message = `I scored ${score.value} points on #JSCrush as a ${title.value[1]}!`
-  shareToTwitter(message)
 }
 </script>
 

@@ -4,6 +4,7 @@ import { ref, computed } from 'vue'
 import { chunkTwo } from './utils'
 import { getRandomData } from './data'
 import { setSeed } from './data'
+import { shareToTwitter } from './utils'
 
 export interface Tile {
   text: string,
@@ -140,3 +141,7 @@ export let title = computed(() => {
   }
 })
 
+export function share() {
+  const message = `I scored ${score.value} points on #JSCrush as a ${title.value[1]}!`
+  shareToTwitter(message)
+}
