@@ -15,12 +15,17 @@ const DURATION = 1000
 let scoreUpdate = 0
 let maxUpdate = 0
 function updateDisplay() {
+  let set = false
   if (displayScore.value !== score.value) {
     displayScore.value = Math.min(displayScore.value + scoreUpdate, score.value)
-    requestAnimationFrame(updateDisplay)
+    set = true
   }
   if (maxScore.value !== displayMaxScore.value) {
     displayMaxScore.value = Math.min(displayMaxScore.value + maxUpdate, maxScore.value)
+    set = true
+  }
+  if (set) {
+    requestAnimationFrame(updateDisplay)
   }
 }
 watch(() => score.value, () => {
