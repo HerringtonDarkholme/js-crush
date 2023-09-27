@@ -50,13 +50,12 @@ watch(() => title.value[1], (to, from) => {
   setTimeout(() => showPromotion.value = false, 800)
 })
 
-let showDecrease = ref(false)
+let showDecrease = ref(0)
 watch(() => life.value, (to, from) => {
-  console.log(to, from)
-  if (from > to) {
-    showDecrease.value = true
+  if (from - to > 1) {
+    showDecrease.value = from - to
   }
-  setTimeout(() => showDecrease.value = false, 400)
+  setTimeout(() => showDecrease.value = 0, 400)
 })
 </script>
 
@@ -69,7 +68,7 @@ watch(() => life.value, (to, from) => {
           <span class="up" v-if="showPromotion">↑</span>
         </transition>
         <transition>
-          <span class="down" v-if="showDecrease">-1</span>
+          <span class="down" v-if="showDecrease">-{{showDecrease}}</span>
         </transition>
       </em>
     </div>

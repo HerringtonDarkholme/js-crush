@@ -55,17 +55,18 @@ type Log =
 
 export const logs = ref([] as string[])
 
-export let life = ref(5)
+export let life = ref(60)
 
 export function addLog(log: Log) {
   let logStr = ''
   switch (log.type) {
     case 'NoCrush': {
-      life.value -= 1
+      life.value = Math.max(life.value - 5, 0)
       logStr = `${log.prevText} != ${log.currentText}\nNo Crush...`
       break
     }
     case 'Crushed': {
+      life.value += 1
       const text = [...chunkTwo(log.selectedText)]
         .map(([prev, curr]) => `* ${prev} == ${curr}`)
         .join('\n')
@@ -74,13 +75,19 @@ export function addLog(log: Log) {
       break
     }
     case 'Promotion': {
-      life.value += 3
+      life.value += 30
       logStr = `Congratulation! You have been promoted \nfrom ${log.from} \nto ${log.to} `
       break
     }
   }
   logs.value.push(logStr)
 }
+
+setInterval(() => {
+  if (life.value > 0 && tableData.value.length) {
+    life.value -= 1
+  }
+}, 1000)
 
 export let seedRef = ref('')
 export function startNewGame() {
@@ -90,7 +97,7 @@ export function startNewGame() {
     // default to timestamp
     seed = Date.now().toString(36);
   }
-  life.value = 5
+  life.value = 60
   score.value = 0
   setSeed(seed);
   initTableData()
