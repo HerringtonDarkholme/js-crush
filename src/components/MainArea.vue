@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import Game from './Game.vue';
 import { startNewGame, score, title, life, share } from './state'
-import { shuffle } from './sound'
+import { shuffle, hasSound } from './sound'
 import { nextTick, ref} from 'vue'
 
 enum Step {
@@ -11,7 +11,6 @@ enum Step {
 }
 
 let step = ref(Step.NotStart)
-// 开始游戏
 async function startGame() {
   step.value = Step.Started
   shuffle()
@@ -38,6 +37,10 @@ async function startGame() {
       <p>
         <button class="btn btn-primary" @click="startGame">Start</button>
       </p>
+      <label>
+        <input type="checkbox" v-model="hasSound">
+        Sound Effect
+      </label>
     </div>
     <transition>
       <div class="game-over" v-if="life === 0">

@@ -1,5 +1,8 @@
+import { ref } from 'vue'
 // Create a new AudioContext object
 const audioContext = new AudioContext()
+
+export const hasSound = ref(true)
 
 function createBuffer(soundURL: string) {
   // Create a request to fetch the sound file
@@ -25,6 +28,9 @@ export const correct = () => createBuffer('/eliminate.aac').then(playBuffer)
 export const wrong = () => createBuffer('/wrong.aac').then(playBuffer)
 
 function playBuffer(buffer: AudioBuffer ) {
+  if (!hasSound.value) {
+    return
+  }
   // Create a buffer source node to play the sound
   var bufferSource = audioContext.createBufferSource()
   // set buffer
