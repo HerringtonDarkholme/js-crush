@@ -68,7 +68,7 @@ export function addLog(log: Log) {
       break
     }
     case 'Crushed': {
-      life.value += 1
+      life.value += log.selectedText.length - 1
       const text = [...chunkTwo(log.selectedText)]
         .map(([prev, curr]) => `* ${prev} == ${curr}`)
         .join('\n')
