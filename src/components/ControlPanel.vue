@@ -41,7 +41,7 @@ watch(logs, () => {
       Made by <a href="https://twitter.com/hd_nvim" target="_blank">Herrington Darkholme</a>.
       <br/>
       If you like the game, you can support me by giving
-      <a href="https://github.com/ast-grep/ast-grep" target="_blank">ast-grep</a> a star😉.
+      <a href="https://ast-grep.github.io" target="_blank">ast-grep</a> a star😉.
     </p>
   </div>
 </template>
