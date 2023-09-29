@@ -13,12 +13,14 @@ export interface Tile {
 }
 
 export let tableData = ref([] as Tile[][])
-export const SIZE = 8;
+export const size = () => {
+  return Math.min(Math.floor(document.getElementById('game')!.clientWidth / 60), 8)
+};
 function initTableData() {
   const data: Tile[][] = [];
-  for (let i = 0; i < SIZE; i++) {
+  for (let i = 0; i < size(); i++) {
     let row = [];
-    for (let j = 0; j < SIZE; j++) {
+    for (let j = 0; j < size(); j++) {
       let [text, color] = getRandomData();
       row.push({
         text: text,

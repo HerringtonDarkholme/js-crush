@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { getRandomData, isEqual } from './data'
-import { addLog, addScore, Tile, SIZE, tableData } from './state'
+import { addLog, addScore, Tile, size, tableData } from './state'
 import { chunkTwo, sleep } from './utils'
 import {reactive} from 'vue'
 import { tile, correct, wrong } from './sound'
@@ -8,10 +8,10 @@ import { tile, correct, wrong } from './sound'
 type SelectedCells = {rowIndex: number, colIndex: number}[];
 // 将剩余的格子向下移动
 async function moveDown(tableData: Tile[][]) {
-  for (let rowIndex = 0; rowIndex < SIZE; rowIndex++) {
+  for (let rowIndex = 0; rowIndex < size(); rowIndex++) {
     const row = tableData[rowIndex]
     let colIndex = 0
-    while (colIndex < SIZE) {
+    while (colIndex < size()) {
       if (colIndex >= row.length) {
         const [text, color] = getRandomData()
         row.push({
@@ -244,7 +244,7 @@ const state = reactive({
 
 #game {
   width: min(100vmin, 750px);
-  font-size: min(14px, 2vmin);
+  font-size: min(14px, 3vmin);
   user-select: none;
   font-family: monospace;
   touch-action: none;
