@@ -39,6 +39,9 @@ watch(() => score.value, () => {
 
 let showPromotion = ref(false)
 watch(() => title.value[1], (to, from) => {
+  if(score.value === 0) {
+    return
+  }
   if (to !== 'JavaScript Learner') {
     showPromotion.value = true
   }
